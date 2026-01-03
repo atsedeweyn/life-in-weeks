@@ -88,7 +88,7 @@ jobs:
             librsvg2-dev
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build GUI (Tauri)
         run: npm run tauri build
@@ -98,16 +98,41 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          file=$(ls src-tauri/target/release/bundle/msi/*.msi | head -n 1)
-          cp "$file" liw-gui-windows.msi
+          nsis=$(ls src-tauri/target/release/bundle/nsis/*.exe 2>/dev/null | head -n 1 || true)
+          if [ -n "$nsis" ]; then
+            cp "$nsis" liw-gui-windows.exe
+          else
+            msi=$(ls src-tauri/target/release/bundle/msi/*.msi 2>/dev/null | head -n 1 || true)
+            if [ -n "$msi" ]; then
+              cp "$msi" liw-gui-windows.msi
+            else
+              echo "No Windows GUI installer found." >&2
+              exit 1
+            fi
+          fi
 
       - name: Prepare GUI artifact (macOS)
         if: matrix.os == 'macos-latest'
         shell: bash
         run: |
           set -euo pipefail
-          file=$(ls src-tauri/target/release/bundle/dmg/*.dmg | head -n 1)
-          cp "$file" liw-gui-macos.dmg
+          dmg=$(ls src-tauri/target/release/bundle/dmg/*.dmg 2>/dev/null | head -n 1 || true)
+          if [ -n "$dmg" ]; then
+            cp "$dmg" liw-gui-macos.dmg
+          else
+            app_tgz=$(ls src-tauri/target/release/bundle/macos/*.app.tar.gz 2>/dev/null | head -n 1 || true)
+            if [ -n "$app_tgz" ]; then
+              cp "$app_tgz" liw-gui-macos.app.tar.gz
+            else
+              app_zip=$(ls src-tauri/target/release/bundle/macos/*.app.zip 2>/dev/null | head -n 1 || true)
+              if [ -n "$app_zip" ]; then
+                cp "$app_zip" liw-gui-macos.app.zip
+              else
+                echo "No macOS GUI bundle found." >&2
+                exit 1
+              fi
+            fi
+          fi
 
       - name: Prepare GUI artifact (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -118,8 +143,18 @@ jobs:
           if [ -n "$appimage" ]; then
             cp "$appimage" liw-gui-linux.AppImage
           else
-            deb=$(ls src-tauri/target/release/bundle/deb/*.deb | head -n 1)
-            cp "$deb" liw-gui-linux.deb
+            deb=$(ls src-tauri/target/release/bundle/deb/*.deb 2>/dev/null | head -n 1 || true)
+            if [ -n "$deb" ]; then
+              cp "$deb" liw-gui-linux.deb
+            else
+              rpm=$(ls src-tauri/target/release/bundle/rpm/*.rpm 2>/dev/null | head -n 1 || true)
+              if [ -n "$rpm" ]; then
+                cp "$rpm" liw-gui-linux.rpm
+              else
+                echo "No Linux GUI bundle found." >&2
+                exit 1
+              fi
+            fi
           fi
 
       - name: Upload GUI bundles
@@ -128,9 +163,13 @@ jobs:
           name: gui-${{ matrix.os }}
           path: |
             liw-gui-windows.msi
+            liw-gui-windows.exe
             liw-gui-macos.dmg
+            liw-gui-macos.app.tar.gz
+            liw-gui-macos.app.zip
             liw-gui-linux.AppImage
             liw-gui-linux.deb
+            liw-gui-linux.rpm
           if-no-files-found: ignore
 
   release:

@@ -321,10 +321,12 @@
     };
 
     const fallbackGuiLinks = {
-        'windows': { url: `${RELEASE_BASE}/liw-gui-windows.msi`, label: '.msi Installer' },
+        'windows': { url: `${RELEASE_BASE}/liw-gui-windows.exe`, label: '.exe Installer' },
         'macos': { url: `${RELEASE_BASE}/liw-gui-macos.dmg`, label: '.dmg Installer' },
         'linux': { url: `${RELEASE_BASE}/liw-gui-linux.AppImage`, label: '.AppImage' }
     };
+
+    const guiNamePattern = 'life[\\s_-]?in[\\s_-]?weeks';
 
     function pickAsset(assets, patterns) {
         for (const pattern of patterns) {
@@ -401,7 +403,12 @@
             }
         });
 
-        const guiWin = pickAsset(assets, [/^liw-gui-windows\.exe$/i, /^liw-gui-windows\.msi$/i]);
+        const guiWin = pickAsset(assets, [
+            /^liw-gui-windows\.exe$/i,
+            /^liw-gui-windows\.msi$/i,
+            new RegExp(`^${guiNamePattern}.*\\.exe$`, 'i'),
+            new RegExp(`^${guiNamePattern}.*\\.msi$`, 'i')
+        ]);
         if (guiWin && guiWin.browser_download_url) {
             guiLinks.windows.url = guiWin.browser_download_url;
             guiLinks.windows.label = guiWin.name.toLowerCase().endswith('.exe') ? '.exe Installer' : '.msi Installer';
@@ -409,18 +416,48 @@
             guiLinks.windows.url = RELEASE_PAGE;
         }
 
-        const guiMac = pickAsset(assets, [/^liw-gui-macos\.dmg$/i]);
+        const guiMac = pickAsset(assets, [
+            /^liw-gui-macos\.dmg$/i,
+            /^liw-gui-macos\.app\.tar\.gz$/i,
+            /^liw-gui-macos\.app\.zip$/i,
+            new RegExp(`^${guiNamePattern}.*\\.dmg$`, 'i'),
+            new RegExp(`^${guiNamePattern}.*\\.app\\.tar\\.gz$`, 'i'),
+            new RegExp(`^${guiNamePattern}.*\\.app\\.zip$`, 'i')
+        ]);
         if (guiMac && guiMac.browser_download_url) {
             guiLinks.macos.url = guiMac.browser_download_url;
-            guiLinks.macos.label = '.dmg Installer';
+            const macName = guiMac.name.toLowerCase();
+            if (macName.endsWith('.dmg')) {
+                guiLinks.macos.label = '.dmg Installer';
+            } else if (macName.endsWith('.app.tar.gz')) {
+                guiLinks.macos.label = '.app Bundle (.tar.gz)';
+            } else if (macName.endsWith('.app.zip')) {
+                guiLinks.macos.label = '.app Bundle (.zip)';
+            } else {
+                guiLinks.macos.label = 'macOS Bundle';
+            }
         } else {
             guiLinks.macos.url = RELEASE_PAGE;
         }
 
-        const guiLinux = pickAsset(assets, [/^liw-gui-linux\.AppImage$/i, /^liw-gui-linux\.deb$/i]);
+        const guiLinux = pickAsset(assets, [
+            /^liw-gui-linux\.AppImage$/i,
+            /^liw-gui-linux\.deb$/i,
+            /^liw-gui-linux\.rpm$/i,
+            new RegExp(`^${guiNamePattern}.*\\.AppImage$`, 'i'),
+            new RegExp(`^${guiNamePattern}.*\\.deb$`, 'i'),
+            new RegExp(`^${guiNamePattern}.*\\.rpm$`, 'i')
+        ]);
         if (guiLinux && guiLinux.browser_download_url) {
             guiLinks.linux.url = guiLinux.browser_download_url;
-            guiLinks.linux.label = guiLinux.name.toLowerCase().endswith('.deb') ? '.deb Package' : '.AppImage';
+            const linuxName = guiLinux.name.toLowerCase();
+            if (linuxName.endsWith('.deb')) {
+                guiLinks.linux.label = '.deb Package';
+            } else if (linuxName.endsWith('.rpm')) {
+                guiLinks.linux.label = '.rpm Package';
+            } else {
+                guiLinks.linux.label = '.AppImage';
+            }
         } else {
             guiLinks.linux.url = RELEASE_PAGE;
         }
