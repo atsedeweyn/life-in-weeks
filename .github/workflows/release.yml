@@ -93,11 +93,45 @@ jobs:
       - name: Build GUI (Tauri)
         run: npm run tauri build
 
+      - name: Prepare GUI artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          file=$(ls src-tauri/target/release/bundle/msi/*.msi | head -n 1)
+          cp "$file" liw-gui-windows.msi
+
+      - name: Prepare GUI artifact (macOS)
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          file=$(ls src-tauri/target/release/bundle/dmg/*.dmg | head -n 1)
+          cp "$file" liw-gui-macos.dmg
+
+      - name: Prepare GUI artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          appimage=$(ls src-tauri/target/release/bundle/appimage/*.AppImage 2>/dev/null | head -n 1 || true)
+          if [ -n "$appimage" ]; then
+            cp "$appimage" liw-gui-linux.AppImage
+          else
+            deb=$(ls src-tauri/target/release/bundle/deb/*.deb | head -n 1)
+            cp "$deb" liw-gui-linux.deb
+          fi
+
       - name: Upload GUI bundles
         uses: actions/upload-artifact@v4
         with:
           name: gui-${{ matrix.os }}
-          path: src-tauri/target/release/bundle/**
+          path: |
+            liw-gui-windows.msi
+            liw-gui-macos.dmg
+            liw-gui-linux.AppImage
+            liw-gui-linux.deb
+          if-no-files-found: ignore
 
   release:
     needs: [build-cli, build-gui]

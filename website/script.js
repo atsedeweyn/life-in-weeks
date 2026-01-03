@@ -310,7 +310,11 @@
     const REPO = 'atsedeweyn/life-in-weeks';
     const RELEASE_BASE = `https://github.com/${REPO}/releases/latest/download`;
     const RELEASE_PAGE = `https://github.com/${REPO}/releases/latest`;
-    const API_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
+    const GUI_URLS = {
+        'windows': `${RELEASE_BASE}/liw-gui-windows.msi`,
+        'macos': `${RELEASE_BASE}/liw-gui-macos.dmg`,
+        'linux': `${RELEASE_BASE}/liw-gui-linux.AppImage`
+    };
     
     // Detect user's platform
     function detectPlatform() {
@@ -393,49 +397,25 @@
             card.classList.add('recommended');
         }
     }
-    
-    // Fetch latest release from GitHub API to get GUI installer URLs
-    fetch(API_URL)
-        .then(res => res.json())
-        .then(release => {
-            if (!release.assets) return;
-            
-            const assets = release.assets;
-            
-            // Find GUI installer assets by file extension
-            const windowsMsi = assets.find(a => a.name.endsWith('.msi'));
-            const windowsExe = assets.find(a => a.name.endsWith('.exe') && a.name.includes('setup'));
-            const macosDmg = assets.find(a => a.name.endsWith('.dmg'));
-            const linuxAppImage = assets.find(a => a.name.endsWith('.AppImage'));
-            const linuxDeb = assets.find(a => a.name.endsWith('.deb'));
-            
-            // Update Windows GUI link
-            const winCard = document.getElementById('gui-windows');
-            if (winCard && (windowsMsi || windowsExe)) {
-                const asset = windowsMsi || windowsExe;
-                winCard.href = asset.browser_download_url;
-                winCard.removeAttribute('target');
-            }
-            
-            // Update macOS GUI link
-            const macCard = document.getElementById('gui-macos');
-            if (macCard && macosDmg) {
-                macCard.href = macosDmg.browser_download_url;
-                macCard.removeAttribute('target');
-            }
-            
-            // Update Linux GUI link
-            const linuxCard = document.getElementById('gui-linux');
-            if (linuxCard && (linuxAppImage || linuxDeb)) {
-                const asset = linuxAppImage || linuxDeb;
-                linuxCard.href = asset.browser_download_url;
-                linuxCard.removeAttribute('target');
-            }
-        })
-        .catch(err => {
-            // If API fails, links remain pointing to releases page
-            console.log('Could not fetch release info:', err);
-        });
+
+    // Ensure GUI cards point to stable asset names for direct download
+    const winCard = document.getElementById('gui-windows');
+    if (winCard) {
+        winCard.href = GUI_URLS.windows;
+        winCard.removeAttribute('target');
+    }
+
+    const macCard = document.getElementById('gui-macos');
+    if (macCard) {
+        macCard.href = GUI_URLS.macos;
+        macCard.removeAttribute('target');
+    }
+
+    const linuxCard = document.getElementById('gui-linux');
+    if (linuxCard) {
+        linuxCard.href = GUI_URLS.linux;
+        linuxCard.removeAttribute('target');
+    }
 })();
 
 // ========================================
