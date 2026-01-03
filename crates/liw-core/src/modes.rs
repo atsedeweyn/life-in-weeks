@@ -344,6 +344,7 @@ fn is_leap_year(year: i32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::Weekday;
 
     #[test]
     fn test_week_start() {
