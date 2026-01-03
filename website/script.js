@@ -306,27 +306,62 @@
 // Platform Detection & Direct Downloads
 // ========================================
 
-(function initDownloads() {
+(async function initDownloads() {
     const REPO = 'atsedeweyn/life-in-weeks';
     const RELEASE_BASE = `https://github.com/${REPO}/releases/latest/download`;
     const RELEASE_PAGE = `https://github.com/${REPO}/releases/latest`;
-    const GUI_URLS = {
-        'windows': `${RELEASE_BASE}/liw-gui-windows.msi`,
-        'macos': `${RELEASE_BASE}/liw-gui-macos.dmg`,
-        'linux': `${RELEASE_BASE}/liw-gui-linux.AppImage`
+    const RELEASE_API = `https://api.github.com/repos/${REPO}/releases/latest`;
+
+    const fallbackCliUrls = {
+        'windows': `${RELEASE_BASE}/liw-windows-amd64.exe`,
+        'macos': `${RELEASE_BASE}/liw-macos-amd64`,
+        'macos-arm': `${RELEASE_BASE}/liw-macos-arm64`,
+        'linux': `${RELEASE_BASE}/liw-linux-amd64`,
+        'unknown': RELEASE_PAGE
     };
-    
+
+    const fallbackGuiLinks = {
+        'windows': { url: `${RELEASE_BASE}/liw-gui-windows.msi`, label: '.msi Installer' },
+        'macos': { url: `${RELEASE_BASE}/liw-gui-macos.dmg`, label: '.dmg Installer' },
+        'linux': { url: `${RELEASE_BASE}/liw-gui-linux.AppImage`, label: '.AppImage' }
+    };
+
+    function pickAsset(assets, patterns) {
+        for (const pattern of patterns) {
+            const match = assets.find(asset => pattern.test(asset.name));
+            if (match) {
+                return match;
+            }
+        }
+        return null;
+    }
+
+    async function loadReleaseAssets() {
+        try {
+            const res = await fetch(RELEASE_API, {
+                headers: { 'Accept': 'application/vnd.github+json' }
+            });
+            if (!res.ok) {
+                return null;
+            }
+            const data = await res.json();
+            return Array.isArray(data.assets) ? data.assets : [];
+        } catch (err) {
+            return null;
+        }
+    }
+
     // Detect user's platform
     function detectPlatform() {
         const ua = navigator.userAgent.toLowerCase();
         const platform = navigator.platform?.toLowerCase() || '';
-        
+
         if (ua.includes('win') || platform.includes('win')) {
             return 'windows';
         } else if (ua.includes('mac') || platform.includes('mac')) {
             // Check for Apple Silicon
-            const isARM = ua.includes('arm') || 
-                         (navigator.userAgentData?.platform === 'macOS' && 
+            const isARM = ua.includes('arm') ||
+                         (navigator.userAgentData?.platform === 'macOS' &&
                           navigator.userAgentData?.architecture === 'arm');
             return isARM ? 'macos-arm' : 'macos';
         } else if (ua.includes('linux') || platform.includes('linux')) {
@@ -334,33 +369,71 @@
         }
         return 'unknown';
     }
-    
+
     const platform = detectPlatform();
-    
-    // CLI download URLs - these trigger direct downloads (fixed filenames)
-    const cliUrls = {
-        'windows': `${RELEASE_BASE}/liw-windows-amd64.exe`,
-        'macos': `${RELEASE_BASE}/liw-macos-amd64`,
-        'macos-arm': `${RELEASE_BASE}/liw-macos-arm64`,
-        'linux': `${RELEASE_BASE}/liw-linux-amd64`,
-        'unknown': RELEASE_PAGE
-    };
-    
+
     const platformNames = {
         'windows': 'Windows',
         'macos': 'macOS (Intel)',
         'macos-arm': 'macOS (Apple Silicon)',
         'linux': 'Linux'
     };
-    
+
+    let cliUrls = { ...fallbackCliUrls };
+    let guiLinks = {
+        'windows': { ...fallbackGuiLinks.windows },
+        'macos': { ...fallbackGuiLinks.macos },
+        'linux': { ...fallbackGuiLinks.linux }
+    };
+
+    const assets = await loadReleaseAssets();
+    if (assets) {
+        const cliAssetMap = {
+            'windows': pickAsset(assets, [/^liw-windows-amd64\.exe$/i]),
+            'macos': pickAsset(assets, [/^liw-macos-amd64$/i]),
+            'macos-arm': pickAsset(assets, [/^liw-macos-arm64$/i]),
+            'linux': pickAsset(assets, [/^liw-linux-amd64$/i])
+        };
+
+        Object.entries(cliAssetMap).forEach(([key, asset]) => {
+            if (asset && asset.browser_download_url) {
+                cliUrls[key] = asset.browser_download_url;
+            }
+        });
+
+        const guiWin = pickAsset(assets, [/^liw-gui-windows\.exe$/i, /^liw-gui-windows\.msi$/i]);
+        if (guiWin && guiWin.browser_download_url) {
+            guiLinks.windows.url = guiWin.browser_download_url;
+            guiLinks.windows.label = guiWin.name.toLowerCase().endswith('.exe') ? '.exe Installer' : '.msi Installer';
+        } else {
+            guiLinks.windows.url = RELEASE_PAGE;
+        }
+
+        const guiMac = pickAsset(assets, [/^liw-gui-macos\.dmg$/i]);
+        if (guiMac && guiMac.browser_download_url) {
+            guiLinks.macos.url = guiMac.browser_download_url;
+            guiLinks.macos.label = '.dmg Installer';
+        } else {
+            guiLinks.macos.url = RELEASE_PAGE;
+        }
+
+        const guiLinux = pickAsset(assets, [/^liw-gui-linux\.AppImage$/i, /^liw-gui-linux\.deb$/i]);
+        if (guiLinux && guiLinux.browser_download_url) {
+            guiLinks.linux.url = guiLinux.browser_download_url;
+            guiLinks.linux.label = guiLinux.name.toLowerCase().endswith('.deb') ? '.deb Package' : '.AppImage';
+        } else {
+            guiLinks.linux.url = RELEASE_PAGE;
+        }
+    }
+
     // Update CLI download button
     const cliBtn = document.getElementById('cli-download-btn');
     if (cliBtn && platform !== 'unknown') {
         cliBtn.href = cliUrls[platform];
         cliBtn.textContent = `Download for ${platformNames[platform]}`;
-        cliBtn.removeAttribute('target'); // Direct download, no new tab
+        cliBtn.removeAttribute('target');
     }
-    
+
     // Auto-select user's platform in the platform selector
     const platformMap = {
         'windows': 'windows',
@@ -368,12 +441,12 @@
         'macos-arm': 'macos',
         'linux': 'linux'
     };
-    
+
     const platformKey = platformMap[platform];
     if (platformKey) {
         const platformBtn = document.querySelector(`.platform-btn[data-platform="${platformKey}"]`);
         const platformInst = document.querySelector(`.platform-instructions[data-platform="${platformKey}"]`);
-        
+
         if (platformBtn && platformInst) {
             document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.platform-instructions').forEach(inst => inst.classList.remove('active'));
@@ -381,7 +454,7 @@
             platformInst.classList.add('active');
         }
     }
-    
+
     // Highlight recommended GUI download card
     const guiCardMap = {
         'windows': 'gui-windows',
@@ -389,7 +462,7 @@
         'macos-arm': 'gui-macos',
         'linux': 'gui-linux'
     };
-    
+
     const cardId = guiCardMap[platform];
     if (cardId) {
         const card = document.getElementById(cardId);
@@ -398,24 +471,25 @@
         }
     }
 
-    // Ensure GUI cards point to stable asset names for direct download
-    const winCard = document.getElementById('gui-windows');
-    if (winCard) {
-        winCard.href = GUI_URLS.windows;
-        winCard.removeAttribute('target');
+    function updateGuiCard(card, info) {
+        if (!card) {
+            return;
+        }
+        card.href = info.url;
+        const label = card.querySelector('p');
+        if (label && info.label) {
+            label.textContent = info.label;
+        }
+        if (info.url === RELEASE_PAGE) {
+            card.setAttribute('target', '_blank');
+        } else {
+            card.removeAttribute('target');
+        }
     }
 
-    const macCard = document.getElementById('gui-macos');
-    if (macCard) {
-        macCard.href = GUI_URLS.macos;
-        macCard.removeAttribute('target');
-    }
-
-    const linuxCard = document.getElementById('gui-linux');
-    if (linuxCard) {
-        linuxCard.href = GUI_URLS.linux;
-        linuxCard.removeAttribute('target');
-    }
+    updateGuiCard(document.getElementById('gui-windows'), guiLinks.windows);
+    updateGuiCard(document.getElementById('gui-macos'), guiLinks.macos);
+    updateGuiCard(document.getElementById('gui-linux'), guiLinks.linux);
 })();
 
 // ========================================
