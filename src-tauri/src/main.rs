@@ -7,18 +7,15 @@
     windows_subsystem = "windows"
 )]
 
+use base64::engine::general_purpose::STANDARD as BASE64;
+use base64::Engine;
 use chrono::NaiveDate;
 use liw_core::{
-    Config, Mode, Theme, WeekGrid,
-    render_grid, set_wallpaper as core_set_wallpaper,
-    install_schedule, uninstall_schedule,
-    renderer::save_grid,
-    scheduler::is_schedule_installed,
+    install_schedule, render_grid, renderer::save_grid, scheduler::is_schedule_installed,
+    set_wallpaper as core_set_wallpaper, uninstall_schedule, Config, Mode, Theme, WeekGrid,
 };
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
-use base64::Engine;
-use base64::engine::general_purpose::STANDARD as BASE64;
 
 /// Request payload for generating a preview
 #[derive(Debug, Deserialize)]
@@ -122,7 +119,7 @@ fn generate_preview(request: GenerateRequest) -> Result<GenerateResponse, String
     image
         .write_to(&mut buffer, image::ImageFormat::Png)
         .map_err(|e| format!("Failed to encode image: {}", e))?;
-    
+
     let image_base64 = BASE64.encode(buffer.get_ref());
 
     let remaining = grid.total_weeks.saturating_sub(grid.elapsed_weeks + 1);
@@ -176,20 +173,18 @@ fn set_wallpaper_cmd(request: GenerateRequest) -> Result<String, String> {
     let image = render_grid(&grid, &theme, width, height);
 
     // Save to output path
-    let output_path = Config::default_output_path()
-        .map_err(|e| format!("Failed to get output path: {}", e))?;
-    
+    let output_path =
+        Config::default_output_path().map_err(|e| format!("Failed to get output path: {}", e))?;
+
     if let Some(parent) = output_path.parent() {
         std::fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create output directory: {}", e))?;
     }
 
-    save_grid(&image, &output_path)
-        .map_err(|e| format!("Failed to save wallpaper: {}", e))?;
+    save_grid(&image, &output_path).map_err(|e| format!("Failed to save wallpaper: {}", e))?;
 
     // Set as wallpaper
-    core_set_wallpaper(&output_path)
-        .map_err(|e| format!("Failed to set wallpaper: {}", e))?;
+    core_set_wallpaper(&output_path).map_err(|e| format!("Failed to set wallpaper: {}", e))?;
 
     Ok(format!("Wallpaper set successfully: {:?}", output_path))
 }
@@ -198,7 +193,7 @@ fn set_wallpaper_cmd(request: GenerateRequest) -> Result<String, String> {
 #[tauri::command]
 fn get_config() -> Result<ConfigState, String> {
     let config = Config::load().unwrap_or_default();
-    
+
     Ok(ConfigState {
         dob: config.dob.map(|d| d.format("%Y-%m-%d").to_string()),
         lifespan_years: config.lifespan_years,
@@ -256,7 +251,9 @@ fn save_config(
         config.next_months = n;
     }
 
-    config.save().map_err(|e| format!("Failed to save config: {}", e))?;
+    config
+        .save()
+        .map_err(|e| format!("Failed to save config: {}", e))?;
 
     Ok("Configuration saved".to_string())
 }

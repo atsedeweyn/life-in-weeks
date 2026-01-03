@@ -29,11 +29,9 @@ impl Mode {
         months: Option<u8>,
     ) -> Result<Self, String> {
         match mode.to_lowercase().as_str() {
-            "next-months" | "next_months" | "months" => {
-                Ok(Mode::NextMonths {
-                    months: months.unwrap_or(6),
-                })
-            }
+            "next-months" | "next_months" | "months" => Ok(Mode::NextMonths {
+                months: months.unwrap_or(6),
+            }),
             "year-end" | "year_end" | "year" => Ok(Mode::YearEnd),
             "life" | "life-weeks" | "life_weeks" => {
                 let dob = dob.ok_or("DOB is required for life mode")?;
@@ -101,11 +99,14 @@ impl WeekGrid {
     /// Calculate the grid based on the mode
     pub fn calculate(mode: &Mode) -> Self {
         let today = Local::now().date_naive();
-        
+
         match mode {
             Mode::NextMonths { months } => Self::calculate_next_months(*months, today),
             Mode::YearEnd => Self::calculate_year_end(today),
-            Mode::Life { dob, lifespan_years } => Self::calculate_life(*dob, *lifespan_years, today),
+            Mode::Life {
+                dob,
+                lifespan_years,
+            } => Self::calculate_life(*dob, *lifespan_years, today),
         }
     }
 
@@ -141,11 +142,14 @@ impl WeekGrid {
         }
 
         let total_weeks = weeks.len();
-        let elapsed_weeks = weeks.iter().filter(|w| w.status == WeekStatus::Past).count();
-        
+        let elapsed_weeks = weeks
+            .iter()
+            .filter(|w| w.status == WeekStatus::Past)
+            .count();
+
         // Calculate grid dimensions (prefer wider layout)
         let columns = (total_weeks as f64).sqrt().ceil() as usize;
-        let rows = (total_weeks + columns - 1) / columns;
+        let rows = total_weeks.div_ceil(columns);
 
         Self {
             weeks,
@@ -191,9 +195,12 @@ impl WeekGrid {
         }
 
         let total_weeks = weeks.len();
-        let elapsed_weeks = weeks.iter().filter(|w| w.status == WeekStatus::Past).count();
+        let elapsed_weeks = weeks
+            .iter()
+            .filter(|w| w.status == WeekStatus::Past)
+            .count();
         let remaining = total_weeks - elapsed_weeks - 1;
-        
+
         // Single row for year-end mode
         let columns = total_weeks;
         let rows = 1;
@@ -253,12 +260,15 @@ impl WeekGrid {
         }
 
         let total_weeks = weeks.len();
-        let elapsed_weeks = weeks.iter().filter(|w| w.status == WeekStatus::Past).count();
+        let elapsed_weeks = weeks
+            .iter()
+            .filter(|w| w.status == WeekStatus::Past)
+            .count();
         let remaining = total_weeks.saturating_sub(elapsed_weeks + 1);
-        
+
         // Life mode: 52 columns (weeks per year) x lifespan rows
         let columns = 52;
-        let rows = (total_weeks + columns - 1) / columns;
+        let rows = total_weeks.div_ceil(columns);
 
         let age_years = (today - dob).num_days() / 365;
         let percentage = (elapsed_weeks as f64 / total_weeks as f64 * 100.0) as u32;
@@ -292,11 +302,11 @@ fn add_months(date: NaiveDate, months: i32) -> NaiveDate {
     let years_to_add = (total_months - 1) / 12;
     let new_month = ((total_months - 1) % 12 + 1) as u32;
     let new_year = date.year() + years_to_add;
-    
+
     // Handle month overflow (e.g., Jan 31 + 1 month)
     let max_day = days_in_month(new_year, new_month);
     let new_day = date.day().min(max_day);
-    
+
     NaiveDate::from_ymd_opt(new_year, new_month, new_day).unwrap()
 }
 
@@ -306,7 +316,7 @@ fn add_years(date: NaiveDate, years: i32) -> NaiveDate {
     // Handle Feb 29 on non-leap years
     let max_day = days_in_month(new_year, date.month());
     let new_day = date.day().min(max_day);
-    
+
     NaiveDate::from_ymd_opt(new_year, date.month(), new_day).unwrap()
 }
 
@@ -352,7 +362,7 @@ mod tests {
             lifespan_years: 80,
         };
         let grid = WeekGrid::calculate(&mode);
-        
+
         // 80 years * 52 weeks ≈ 4160 weeks
         assert!(grid.total_weeks >= 4160 && grid.total_weeks <= 4200);
         assert_eq!(grid.columns, 52);
@@ -361,7 +371,7 @@ mod tests {
     #[test]
     fn test_year_end_mode() {
         let grid = WeekGrid::calculate(&Mode::YearEnd);
-        
+
         // Should have weeks until end of year
         assert!(grid.total_weeks > 0);
         assert!(grid.total_weeks <= 53);

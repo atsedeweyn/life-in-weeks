@@ -101,11 +101,16 @@ fn install_schedule_windows() -> Result<()> {
     let output = Command::new("schtasks")
         .args([
             "/Create",
-            "/SC", "WEEKLY",
-            "/D", "MON",
-            "/TN", TASK_NAME,
-            "/TR", &format!("\"{}\" generate", exe_path_str),
-            "/ST", "06:00",
+            "/SC",
+            "WEEKLY",
+            "/D",
+            "MON",
+            "/TN",
+            TASK_NAME,
+            "/TR",
+            &format!("\"{}\" generate", exe_path_str),
+            "/ST",
+            "06:00",
             "/F", // Force create (overwrite if exists)
         ])
         .output()
@@ -166,7 +171,9 @@ const LAUNCHD_LABEL: &str = "com.lifeinweeks.wallpaper";
 #[cfg(target_os = "macos")]
 fn get_plist_path() -> Result<PathBuf> {
     let home = dirs::home_dir().context("Could not determine home directory")?;
-    Ok(home.join("Library/LaunchAgents").join(format!("{}.plist", LAUNCHD_LABEL)))
+    Ok(home
+        .join("Library/LaunchAgents")
+        .join(format!("{}.plist", LAUNCHD_LABEL)))
 }
 
 #[cfg(target_os = "macos")]
@@ -216,8 +223,7 @@ fn install_schedule_macos() -> Result<()> {
         LAUNCHD_LABEL, exe_path_str
     );
 
-    fs::write(&plist_path, plist_content)
-        .context("Failed to write plist file")?;
+    fs::write(&plist_path, plist_content).context("Failed to write plist file")?;
 
     // Load the job
     let output = Command::new("launchctl")
@@ -248,8 +254,7 @@ fn uninstall_schedule_macos() -> Result<()> {
             .output();
 
         // Remove the plist file
-        fs::remove_file(&plist_path)
-            .context("Failed to remove plist file")?;
+        fs::remove_file(&plist_path).context("Failed to remove plist file")?;
 
         println!("Weekly schedule removed successfully.");
     } else {
@@ -261,9 +266,7 @@ fn uninstall_schedule_macos() -> Result<()> {
 
 #[cfg(target_os = "macos")]
 fn is_schedule_installed_macos() -> bool {
-    get_plist_path()
-        .map(|path| path.exists())
-        .unwrap_or(false)
+    get_plist_path().map(|path| path.exists()).unwrap_or(false)
 }
 
 // ============================================================================
@@ -301,8 +304,7 @@ ExecStart={} generate
     );
 
     let service_path = systemd_dir.join("liw-wallpaper.service");
-    fs::write(&service_path, service_content)
-        .context("Failed to write service file")?;
+    fs::write(&service_path, service_content).context("Failed to write service file")?;
 
     // Create the timer file (every Monday at 6:00 AM)
     let timer_content = r#"[Unit]
@@ -317,8 +319,7 @@ WantedBy=timers.target
 "#;
 
     let timer_path = systemd_dir.join("liw-wallpaper.timer");
-    fs::write(&timer_path, timer_content)
-        .context("Failed to write timer file")?;
+    fs::write(&timer_path, timer_content).context("Failed to write timer file")?;
 
     // Reload systemd and enable the timer
     Command::new("systemctl")

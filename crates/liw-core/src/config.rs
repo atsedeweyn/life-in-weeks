@@ -214,8 +214,7 @@ impl Config {
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create config directory {:?}", parent))?;
         }
-        let contents = toml::to_string_pretty(self)
-            .context("Failed to serialize config")?;
+        let contents = toml::to_string_pretty(self).context("Failed to serialize config")?;
         fs::write(path, contents)
             .with_context(|| format!("Failed to write config to {:?}", path))?;
         Ok(())
@@ -230,7 +229,8 @@ impl Config {
                 self.dob = Some(date);
             }
             "lifespan" | "lifespan_years" => {
-                self.lifespan_years = value.parse()
+                self.lifespan_years = value
+                    .parse()
                     .with_context(|| format!("Invalid lifespan: {}", value))?;
             }
             "theme" => {
@@ -239,22 +239,28 @@ impl Config {
                     "terminal" | "terminal_green" | "terminal-green" => Theme::TerminalGreen,
                     "dark" | "soft_dark" | "soft-dark" => Theme::SoftDark,
                     "sunset" | "sunset_gradient" | "sunset-gradient" => Theme::SunsetGradient,
-                    _ => anyhow::bail!("Unknown theme: {}. Options: minimal, terminal, dark, sunset", value),
+                    _ => anyhow::bail!(
+                        "Unknown theme: {}. Options: minimal, terminal, dark, sunset",
+                        value
+                    ),
                 };
             }
             "width" | "screen_width" => {
-                self.screen_width = value.parse()
+                self.screen_width = value
+                    .parse()
                     .with_context(|| format!("Invalid width: {}", value))?;
             }
             "height" | "screen_height" => {
-                self.screen_height = value.parse()
+                self.screen_height = value
+                    .parse()
                     .with_context(|| format!("Invalid height: {}", value))?;
             }
             "default_mode" | "mode" => {
                 self.default_mode = value.to_string();
             }
             "next_months" | "months" => {
-                self.next_months = value.parse()
+                self.next_months = value
+                    .parse()
                     .with_context(|| format!("Invalid months: {}", value))?;
             }
             _ => anyhow::bail!("Unknown config key: {}", key),

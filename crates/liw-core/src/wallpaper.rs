@@ -173,12 +173,7 @@ fn set_wallpaper_linux(path: &str) -> Result<()> {
     } else if desktop.contains("MATE") {
         // MATE
         Command::new("gsettings")
-            .args([
-                "set",
-                "org.mate.background",
-                "picture-filename",
-                path,
-            ])
+            .args(["set", "org.mate.background", "picture-filename", path])
             .status()
     } else if desktop.contains("Cinnamon") {
         // Cinnamon

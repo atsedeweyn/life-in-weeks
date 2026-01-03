@@ -6,11 +6,8 @@ use anyhow::{Context, Result};
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
 use liw_core::{
-    Config, Mode, WeekGrid,
-    render_grid, set_wallpaper,
-    install_schedule, uninstall_schedule,
-    renderer::save_grid,
-    scheduler::is_schedule_installed,
+    install_schedule, render_grid, renderer::save_grid, scheduler::is_schedule_installed,
+    set_wallpaper, uninstall_schedule, Config, Mode, WeekGrid,
 };
 use std::path::PathBuf;
 
@@ -122,7 +119,9 @@ fn main() -> Result<()> {
             width,
             height,
             theme,
-        } => cmd_generate(mode, dob, lifespan, months, preview, output, width, height, theme),
+        } => cmd_generate(
+            mode, dob, lifespan, months, preview, output, width, height, theme,
+        ),
         Commands::Config(cmd) => match cmd {
             ConfigCommands::Show => cmd_config_show(),
             ConfigCommands::Set { key, value } => cmd_config_set(&key, &value),
@@ -137,6 +136,7 @@ fn main() -> Result<()> {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn cmd_generate(
     mode_str: String,
     dob_str: Option<String>,
@@ -170,8 +170,10 @@ fn cmd_generate(
 
     // Parse DOB
     let dob = if let Some(ref dob_str) = dob_str {
-        Some(NaiveDate::parse_from_str(dob_str, "%Y-%m-%d")
-            .with_context(|| format!("Invalid date format: {}. Use YYYY-MM-DD", dob_str))?)
+        Some(
+            NaiveDate::parse_from_str(dob_str, "%Y-%m-%d")
+                .with_context(|| format!("Invalid date format: {}. Use YYYY-MM-DD", dob_str))?,
+        )
     } else {
         config.dob
     };
@@ -187,7 +189,10 @@ fn cmd_generate(
 
     println!("Generating wallpaper...");
     println!("  Mode: {:?}", mode);
-    println!("  Resolution: {}x{}", config.screen_width, config.screen_height);
+    println!(
+        "  Resolution: {}x{}",
+        config.screen_width, config.screen_height
+    );
     println!("  Theme: {:?}", config.theme);
 
     // Calculate the grid
@@ -197,7 +202,12 @@ fn cmd_generate(
     println!("  Grid: {} columns x {} rows", grid.columns, grid.rows);
 
     // Render the image
-    let image = render_grid(&grid, &config.theme, config.screen_width, config.screen_height);
+    let image = render_grid(
+        &grid,
+        &config.theme,
+        config.screen_width,
+        config.screen_height,
+    );
 
     // Determine output path
     let output_path = if let Some(path) = output {
@@ -229,7 +239,7 @@ fn cmd_generate(
 
 fn cmd_config_show() -> Result<()> {
     let config = Config::load().unwrap_or_default();
-    
+
     println!("Life in Weeks Configuration");
     println!("============================");
     println!();
@@ -240,37 +250,37 @@ fn cmd_config_show() -> Result<()> {
     println!("Screen Height:     {}", config.screen_height);
     println!("Default Mode:      {}", config.default_mode);
     println!("Next Months:       {}", config.next_months);
-    
+
     Ok(())
 }
 
 fn cmd_config_set(key: &str, value: &str) -> Result<()> {
     let mut config = Config::load().unwrap_or_default();
-    
+
     config.set(key, value)?;
     config.save()?;
-    
+
     println!("Configuration updated: {} = {}", key, value);
-    
+
     Ok(())
 }
 
 fn cmd_config_reset() -> Result<()> {
     let config = Config::default();
     config.save()?;
-    
+
     println!("Configuration reset to defaults.");
-    
+
     Ok(())
 }
 
 fn cmd_config_path() -> Result<()> {
     let path = Config::default_path()?;
     println!("Config file: {:?}", path);
-    
+
     let output_path = Config::default_output_path()?;
     println!("Output file: {:?}", output_path);
-    
+
     Ok(())
 }
 
@@ -290,6 +300,6 @@ fn cmd_schedule_status() -> Result<()> {
         println!("Weekly schedule is NOT installed.");
         println!("Run 'liw schedule install' to enable automatic updates.");
     }
-    
+
     Ok(())
 }
