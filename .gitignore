@@ -31,3 +31,4 @@ Thumbs.db
 /tmp/
 *.png
 !tauri-app/src/**/*.png
+!src-tauri/icons/*.png
