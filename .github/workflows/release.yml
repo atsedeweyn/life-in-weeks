@@ -90,29 +90,41 @@ jobs:
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build GUI (Tauri) - Windows
-        if: matrix.os == 'windows-latest'
-        run: npm run tauri build -- --bundles nsis,msi
-
-      - name: Build GUI (Tauri) - macOS
-        if: matrix.os == 'macos-latest'
-        run: npm run tauri build -- --bundles dmg,app
-
-      - name: Build GUI (Tauri) - Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: npm run tauri build -- --bundles deb,appimage
-
-      - name: Debug - List bundle directory
+      - name: Build GUI (Tauri)
         shell: bash
         run: |
-          echo "=== Listing src-tauri/target/release/bundle ==="
+          echo "=== Starting Tauri build ==="
+          echo "Current directory: $(pwd)"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Rust version: $(rustc --version)"
+          echo ""
+          npx tauri build --verbose
+          echo ""
+          echo "=== Build complete ==="
+
+      - name: Debug - List build output
+        if: always()
+        shell: bash
+        run: |
+          echo "=== Checking build output ==="
+          echo "Current directory: $(pwd)"
+          echo ""
+          echo "=== src-tauri directory contents ==="
+          ls -la src-tauri/ || echo "src-tauri not found"
+          echo ""
+          echo "=== target directory ==="
+          ls -la src-tauri/target/ 2>/dev/null || echo "target dir not found"
+          echo ""
+          echo "=== target/release directory ==="
+          ls -la src-tauri/target/release/ 2>/dev/null || echo "release dir not found"
+          echo ""
+          echo "=== Bundle directory ==="
           if [ -d "src-tauri/target/release/bundle" ]; then
-            find src-tauri/target/release/bundle -type f -name "*" | head -50
+            echo "Bundle directory exists!"
+            find src-tauri/target/release/bundle -type f 2>/dev/null | head -50
           else
             echo "Bundle directory does not exist!"
-            echo "=== Listing src-tauri/target ==="
-            ls -la src-tauri/target/ || echo "target dir not found"
-            ls -la src-tauri/target/release/ || echo "release dir not found"
           fi
 
       - name: Prepare GUI artifact (Windows)
