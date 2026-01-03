@@ -1,0 +1,26 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/liw-core",
+    "crates/liw-cli",
+    "src-tauri",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Dag"]
+license = "MIT"
+repository = "https://github.com/atsedeweyn/life-in-weeks"
+description = "Life in Weeks dynamic wallpaper generator"
+
+[workspace.dependencies]
+# Shared dependencies across workspace
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+dirs = "5.0"
+image = "0.24"
+thiserror = "1.0"
+anyhow = "1.0"
+clap = { version = "4.4", features = ["derive"] }

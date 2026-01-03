@@ -1,0 +1,17 @@
+[package]
+name = "liw-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "CLI for Life in Weeks wallpaper generator"
+
+[[bin]]
+name = "liw"
+path = "src/main.rs"
+
+[dependencies]
+liw-core = { path = "../liw-core" }
+clap.workspace = true
+anyhow.workspace = true
+chrono.workspace = true

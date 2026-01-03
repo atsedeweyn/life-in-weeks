@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life in Weeks</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-grid">
+                        <span class="dot past"></span>
+                        <span class="dot past"></span>
+                        <span class="dot current"></span>
+                        <span class="dot future"></span>
+                    </div>
+                    <h1>Life in Weeks</h1>
+                </div>
+                <p class="tagline">Visualize your time. Make it count.</p>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="controls">
+                <div class="control-group">
+                    <label class="control-label">Mode</label>
+                    <div class="mode-tabs">
+                        <button class="mode-tab" data-mode="life">
+                            <span class="mode-icon">∞</span>
+                            <span class="mode-name">Life</span>
+                        </button>
+                        <button class="mode-tab active" data-mode="year-end">
+                            <span class="mode-icon">📅</span>
+                            <span class="mode-name">Year</span>
+                        </button>
+                        <button class="mode-tab" data-mode="next-months">
+                            <span class="mode-icon">→</span>
+                            <span class="mode-name">Months</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-group life-only">
+                        <label class="control-label" for="dob">Date of Birth</label>
+                        <input type="date" id="dob" class="input" />
+                    </div>
+
+                    <div class="control-group life-only">
+                        <label class="control-label" for="lifespan">Lifespan (years)</label>
+                        <input type="number" id="lifespan" class="input" value="80" min="1" max="120" />
+                    </div>
+
+                    <div class="control-group months-only hidden">
+                        <label class="control-label" for="months">Months Ahead</label>
+                        <input type="number" id="months" class="input" value="6" min="1" max="24" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Theme</label>
+                    <div class="theme-grid">
+                        <button class="theme-btn active" data-theme="dark" title="Soft Dark">
+                            <span class="theme-preview dark"></span>
+                            <span class="theme-name">Dark</span>
+                        </button>
+                        <button class="theme-btn" data-theme="terminal" title="Terminal Green">
+                            <span class="theme-preview terminal"></span>
+                            <span class="theme-name">Terminal</span>
+                        </button>
+                        <button class="theme-btn" data-theme="minimal" title="Minimal Ink">
+                            <span class="theme-preview minimal"></span>
+                            <span class="theme-name">Minimal</span>
+                        </button>
+                        <button class="theme-btn" data-theme="sunset" title="Sunset Gradient">
+                            <span class="theme-preview sunset"></span>
+                            <span class="theme-name">Sunset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-row resolution-row">
+                    <div class="control-group">
+                        <label class="control-label" for="width">Width</label>
+                        <input type="number" id="width" class="input input-small" value="1920" />
+                    </div>
+                    <span class="resolution-x">×</span>
+                    <div class="control-group">
+                        <label class="control-label" for="height">Height</label>
+                        <input type="number" id="height" class="input input-small" value="1080" />
+                    </div>
+                    <button class="btn btn-secondary" id="detect-resolution" title="Detect screen resolution">
+                        Auto
+                    </button>
+                </div>
+            </section>
+
+            <section class="preview-section">
+                <div class="preview-header">
+                    <h2 class="preview-title" id="preview-title">Generate a Preview</h2>
+                    <p class="preview-subtitle" id="preview-subtitle">Configure your settings and click Generate</p>
+                </div>
+                <div class="preview-container">
+                    <div class="preview-placeholder" id="preview-placeholder">
+                        <div class="placeholder-grid">
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <p>Your wallpaper preview will appear here</p>
+                    </div>
+                    <img id="preview-image" class="preview-image hidden" alt="Wallpaper Preview" />
+                </div>
+                <div class="stats" id="stats">
+                    <div class="stat">
+                        <span class="stat-value" id="stat-elapsed">--</span>
+                        <span class="stat-label">weeks lived</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-remaining">--</span>
+                        <span class="stat-label">weeks remaining</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-percent">--</span>
+                        <span class="stat-label">of life</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-actions">
+                <button class="btn btn-primary btn-large" id="generate-btn">
+                    <span class="btn-icon">⟳</span>
+                    Generate Preview
+                </button>
+                <button class="btn btn-accent btn-large" id="set-wallpaper-btn" disabled>
+                    <span class="btn-icon">✓</span>
+                    Set as Wallpaper
+                </button>
+            </div>
+            <div class="footer-schedule">
+                <label class="toggle-label">
+                    <input type="checkbox" id="schedule-toggle" class="toggle-input" />
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Update automatically every week</span>
+                </label>
+            </div>
+        </footer>
+    </div>
+
+    <div class="toast hidden" id="toast">
+        <span class="toast-message" id="toast-message"></span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

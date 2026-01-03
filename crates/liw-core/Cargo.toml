@@ -1,0 +1,16 @@
+[package]
+name = "liw-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Core library for Life in Weeks wallpaper generator"
+
+[dependencies]
+chrono.workspace = true
+serde.workspace = true
+toml.workspace = true
+dirs.workspace = true
+image.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true

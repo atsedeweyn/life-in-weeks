@@ -1,0 +1,23 @@
+{
+  "name": "life-in-weeks",
+  "version": "0.1.0",
+  "description": "Life in Weeks - Dynamic wallpaper generator",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "keywords": [
+    "wallpaper",
+    "life-in-weeks",
+    "productivity",
+    "tauri"
+  ],
+  "author": "Dag",
+  "license": "MIT",
+  "devDependencies": {
+    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/cli": "^2.9.6"
+  }
+}

@@ -1,0 +1,327 @@
+/**
+ * Life in Weeks Website - Interactive Scripts
+ * Matrix rain effect and UI interactions
+ */
+
+// ========================================
+// Matrix Rain Effect
+// ========================================
+
+(function initMatrix() {
+    const canvas = document.getElementById('matrix-canvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const matrix = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    const chars = matrix.split('');
+    
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    
+    // Initialize drops
+    for (let x = 0; x < columns; x++) {
+        drops[x] = Math.random() * -100;
+    }
+    
+    function draw() {
+        // Semi-transparent black for trail effect
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#00ff41';
+        ctx.font = fontSize + 'px monospace';
+        
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
+            
+            // Gradient effect - brighter at top
+            const opacity = Math.min(1, (canvas.height - y) / canvas.height);
+            ctx.fillStyle = `rgba(0, 255, 65, ${opacity * 0.3})`;
+            
+            ctx.fillText(text, x, y);
+            
+            // Reset drop to top randomly
+            if (y > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            
+            drops[i]++;
+        }
+    }
+    
+    // Adjust canvas size on resize
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+    
+    // Start animation
+    setInterval(draw, 35);
+})();
+
+// ========================================
+// Tab Switching
+// ========================================
+
+(function initTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.dataset.tab;
+            
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            document.getElementById(`${targetTab}-tab`).classList.add('active');
+        });
+    });
+})();
+
+// ========================================
+// Platform Selector
+// ========================================
+
+(function initPlatformSelector() {
+    const platformButtons = document.querySelectorAll('.platform-btn');
+    const platformInstructions = document.querySelectorAll('.platform-instructions');
+    
+    platformButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const platform = button.dataset.platform;
+            
+            // Remove active class from all buttons and instructions
+            platformButtons.forEach(btn => btn.classList.remove('active'));
+            platformInstructions.forEach(inst => inst.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding instructions
+            button.classList.add('active');
+            document.querySelector(`.platform-instructions[data-platform="${platform}"]`).classList.add('active');
+        });
+    });
+})();
+
+// ========================================
+// Smooth Scrolling
+// ========================================
+
+(function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+})();
+
+// ========================================
+// Scroll Animations
+// ========================================
+
+(function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe feature cards and tutorial steps
+    document.querySelectorAll('.feature-card, .tutorial-step, .note-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+})();
+
+// ========================================
+// Typing Effect for Hero Title
+// ========================================
+
+(function initTypingEffect() {
+    const heroTitle = document.querySelector('.hero-title');
+    if (!heroTitle) return;
+    
+    const text = heroTitle.textContent;
+    heroTitle.textContent = '';
+    heroTitle.style.opacity = '1';
+    
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            heroTitle.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, 50);
+        }
+    }
+    
+    // Start typing after a short delay
+    setTimeout(type, 500);
+})();
+
+// ========================================
+// Copy Code Blocks (Optional Enhancement)
+// ========================================
+
+(function initCodeCopy() {
+    const codeBlocks = document.querySelectorAll('.code-block');
+    
+    codeBlocks.forEach(block => {
+        const button = document.createElement('button');
+        button.textContent = 'Copy';
+        button.className = 'copy-btn';
+        button.style.cssText = `
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 12px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        `;
+        
+        button.addEventListener('mouseenter', () => {
+            button.style.background = 'rgba(0, 255, 65, 0.2)';
+        });
+        
+        button.addEventListener('mouseleave', () => {
+            button.style.background = 'rgba(0, 255, 65, 0.1)';
+        });
+        
+        button.addEventListener('click', () => {
+            const code = block.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        });
+        
+        block.style.position = 'relative';
+        block.appendChild(button);
+    });
+})();
+
+// ========================================
+// Glitch Effect on Logo (Optional)
+// ========================================
+
+(function initGlitchEffect() {
+    const logo = document.querySelector('.header h1');
+    if (!logo) return;
+    
+    const originalText = logo.textContent;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+    
+    function glitch() {
+        let glitched = '';
+        for (let i = 0; i < originalText.length; i++) {
+            if (Math.random() > 0.9) {
+                glitched += chars[Math.floor(Math.random() * chars.length)];
+            } else {
+                glitched += originalText[i];
+            }
+        }
+        logo.textContent = glitched;
+        
+        setTimeout(() => {
+            logo.textContent = originalText;
+        }, 100);
+    }
+    
+    // Glitch on hover
+    logo.addEventListener('mouseenter', () => {
+        const interval = setInterval(glitch, 50);
+        setTimeout(() => clearInterval(interval), 500);
+    });
+})();
+
+// ========================================
+// Stats Counter Animation
+// ========================================
+
+(function initStatsCounter() {
+    const stats = document.querySelectorAll('.stat-value');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.dataset.animated) {
+                entry.target.dataset.animated = 'true';
+                animateValue(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    stats.forEach(stat => observer.observe(stat));
+    
+    function animateValue(element) {
+        const target = parseInt(element.textContent.replace(/,/g, ''));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    }
+})();
+
+// ========================================
+// Console Easter Egg
+// ========================================
+
+(function initEasterEgg() {
+    const style = `
+        color: #00ff41;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    `;
+    
+    console.log('%cLife in Weeks', style);
+    console.log('%cVisualize your time. Make it count.', 'color: #666; font-family: monospace;');
+    console.log('%chttps://github.com/atsedeweyn/life-in-weeks', 'color: #00ff41; font-family: monospace;');
+    
+    // Easter egg command
+    window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+            console.log('%cYou found the secret! 🎉', 'color: #00ff41; font-size: 20px; font-weight: bold;');
+        }
+    });
+})();

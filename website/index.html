@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life in Weeks - Visualize Your Time</title>
+    <meta name="description" content="A dynamic wallpaper generator that visualizes your life in weeks. Track your time, make it count.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-grid">
+                    <span class="dot past"></span>
+                    <span class="dot past"></span>
+                    <span class="dot current"></span>
+                    <span class="dot future"></span>
+                </div>
+                <h1>Life in Weeks</h1>
+            </div>
+            <p class="tagline">Visualize your time. Make it count.</p>
+            <div class="header-buttons">
+                <a href="#download" class="btn btn-primary">Download</a>
+                <a href="https://github.com/atsedeweyn/life-in-weeks" class="btn btn-secondary" target="_blank">GitHub</a>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2 class="hero-title">See Your Life as a Grid of Weeks</h2>
+                <p class="hero-description">
+                    Inspired by Tim Urban's powerful visualization, Life in Weeks transforms your desktop 
+                    into a constant reminder of time's passage. Each week is a square. Each square matters.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-value">4,160</span>
+                        <span class="stat-label">Weeks in 80 Years</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">52</span>
+                        <span class="stat-label">Weeks Per Year</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">1</span>
+                        <span class="stat-label">Week at a Time</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features" id="features">
+            <h2 class="section-title">Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">L</div>
+                    <h3>Life Mode</h3>
+                    <p>Visualize your entire life from birth to expected lifespan. See how many weeks you've lived and how many remain.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">Y</div>
+                    <h3>Year End</h3>
+                    <p>Track weeks remaining until December 31st. Perfect for annual goals and year-end reflections.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&gt;</div>
+                    <h3>Next N Months</h3>
+                    <p>Focus on the upcoming months. Great for project timelines and short-term planning.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">T</div>
+                    <h3>Beautiful Themes</h3>
+                    <p>Choose from 4 carefully crafted themes: Dark, Terminal, Minimal, and Sunset Gradient.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">A</div>
+                    <h3>Auto-Update</h3>
+                    <p>Wallpaper regenerates automatically every Monday at 6 AM. Set it once, forget it.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">X</div>
+                    <h3>Cross-Platform</h3>
+                    <p>Works on Windows, macOS, and Linux. Available as both CLI tool and GUI app.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section class="download" id="download">
+            <h2 class="section-title">Download</h2>
+            <div class="download-tabs">
+                <button class="tab-btn active" data-tab="cli">CLI Tool</button>
+                <button class="tab-btn" data-tab="gui">GUI App</button>
+            </div>
+
+            <!-- CLI Downloads -->
+            <div class="tab-content active" id="cli-tab">
+                <p class="tab-description">For developers and terminal enthusiasts. Lightweight ~5MB binary.</p>
+                <div class="platform-selector">
+                    <button class="platform-btn active" data-platform="windows">Windows</button>
+                    <button class="platform-btn" data-platform="macos">macOS</button>
+                    <button class="platform-btn" data-platform="linux">Linux</button>
+                </div>
+                <div class="download-instructions" id="download-instructions">
+                    <div class="platform-instructions active" data-platform="windows">
+                        <h3>Windows Installation</h3>
+                        <div class="code-block">
+                            <code>
+# Download from GitHub Releases<br>
+# Extract liw.exe<br>
+# Add to PATH or use directly<br>
+<br>
+# Or install via cargo:<br>
+cargo install liw-cli
+                            </code>
+                        </div>
+                    </div>
+                    <div class="platform-instructions" data-platform="macos">
+                        <h3>macOS Installation</h3>
+                        <div class="code-block">
+                            <code>
+# Download from GitHub Releases<br>
+chmod +x liw<br>
+sudo mv liw /usr/local/bin/<br>
+<br>
+# Or install via cargo:<br>
+cargo install liw-cli
+                            </code>
+                        </div>
+                    </div>
+                    <div class="platform-instructions" data-platform="linux">
+                        <h3>Linux Installation</h3>
+                        <div class="code-block">
+                            <code>
+# Download from GitHub Releases<br>
+chmod +x liw<br>
+sudo mv liw /usr/local/bin/<br>
+<br>
+# Or install via cargo:<br>
+cargo install liw-cli
+                            </code>
+                        </div>
+                    </div>
+                </div>
+                <div class="download-buttons">
+                    <a href="https://github.com/atsedeweyn/life-in-weeks/releases/latest" class="btn btn-download" target="_blank">
+                        Download Latest Release
+                    </a>
+                </div>
+            </div>
+
+            <!-- GUI Downloads -->
+            <div class="tab-content" id="gui-tab">
+                <p class="tab-description">Beautiful desktop app for everyone. ~15-20MB installer with visual interface.</p>
+                <div class="gui-downloads">
+                    <a href="https://github.com/atsedeweyn/life-in-weeks/releases/latest" class="download-card" target="_blank">
+                        <div class="download-icon">W</div>
+                        <h3>Windows</h3>
+                        <p>.msi Installer</p>
+                        <span class="download-badge">Download</span>
+                    </a>
+                    <a href="https://github.com/atsedeweyn/life-in-weeks/releases/latest" class="download-card" target="_blank">
+                        <div class="download-icon">M</div>
+                        <h3>macOS</h3>
+                        <p>.dmg Installer</p>
+                        <span class="download-badge">Download</span>
+                    </a>
+                    <a href="https://github.com/atsedeweyn/life-in-weeks/releases/latest" class="download-card" target="_blank">
+                        <div class="download-icon">L</div>
+                        <h3>Linux</h3>
+                        <p>.AppImage</p>
+                        <span class="download-badge">Download</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tutorial Section -->
+        <section class="tutorial" id="tutorial">
+            <h2 class="section-title">How to Use</h2>
+            
+            <!-- CLI Tutorial -->
+            <div class="tutorial-section">
+                <h3 class="tutorial-title">
+                    <span class="tutorial-icon">CLI</span>
+                    CLI Usage
+                </h3>
+                
+                <div class="tutorial-step">
+                    <h4>1. Generate Your First Wallpaper</h4>
+                    <div class="code-block">
+                        <code>
+# Life mode (requires date of birth)<br>
+liw generate --mode life --dob 1995-03-20<br>
+<br>
+# Year-end mode<br>
+liw generate --mode year-end<br>
+<br>
+# Next 6 months<br>
+liw generate --mode next-months --months 6
+                        </code>
+                    </div>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>2. Choose a Theme</h4>
+                    <div class="code-block">
+                        <code>
+# Available themes: dark, terminal, minimal, sunset<br>
+liw generate --mode life --dob 1995-03-20 --theme terminal
+                        </code>
+                    </div>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>3. Preview Without Setting</h4>
+                    <div class="code-block">
+                        <code>
+# Generate but don't set as wallpaper<br>
+liw generate --mode year-end --preview --output ~/Desktop/preview.png
+                        </code>
+                    </div>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>4. Configure Defaults</h4>
+                    <div class="code-block">
+                        <code>
+# Set your date of birth<br>
+liw config set dob 1995-03-20<br>
+<br>
+# Set expected lifespan<br>
+liw config set lifespan 80<br>
+<br>
+# Set default theme<br>
+liw config set theme dark<br>
+<br>
+# View current config<br>
+liw config show
+                        </code>
+                    </div>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>5. Enable Weekly Auto-Update</h4>
+                    <div class="code-block">
+                        <code>
+# Install weekly schedule (runs every Monday at 6 AM)<br>
+liw schedule install<br>
+<br>
+# Check schedule status<br>
+liw schedule status<br>
+<br>
+# Remove schedule<br>
+liw schedule uninstall
+                        </code>
+                    </div>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>6. Custom Resolution</h4>
+                    <div class="code-block">
+                        <code>
+# Generate for specific screen size<br>
+liw generate --mode life --dob 1995-03-20 --width 2560 --height 1440
+                        </code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GUI Tutorial -->
+            <div class="tutorial-section">
+                <h3 class="tutorial-title">
+                    <span class="tutorial-icon">GUI</span>
+                    GUI App Usage
+                </h3>
+                
+                <div class="tutorial-step">
+                    <h4>1. Install and Launch</h4>
+                    <p>Download the installer for your platform and run it. Launch "Life in Weeks" from your applications.</p>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>2. Choose Your Mode</h4>
+                    <p>Select from three tabs at the top:</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Life</strong> - Enter your date of birth and expected lifespan</li>
+                        <li><strong>Year</strong> - Shows weeks until end of current year</li>
+                        <li><strong>Months</strong> - Set how many months ahead to visualize</li>
+                    </ul>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>3. Customize Theme</h4>
+                    <p>Click on one of the four theme previews:</p>
+                    <ul class="tutorial-list">
+                        <li><strong>Dark</strong> - Soft dark with coral accents (default)</li>
+                        <li><strong>Terminal</strong> - Green on black, Matrix style</li>
+                        <li><strong>Minimal</strong> - Black on cream, classic poster</li>
+                        <li><strong>Sunset</strong> - Warm gradient from past to future</li>
+                    </ul>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>4. Generate Preview</h4>
+                    <p>Click "Generate Preview" to see your wallpaper. The preview updates in real-time with your settings.</p>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>5. Set as Wallpaper</h4>
+                    <p>Once you're happy with the preview, click "Set as Wallpaper" to apply it to your desktop.</p>
+                </div>
+
+                <div class="tutorial-step">
+                    <h4>6. Enable Auto-Update</h4>
+                    <p>Toggle "Update automatically every week" to have your wallpaper regenerate every Monday at 6 AM.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform-Specific Notes -->
+        <section class="platform-notes">
+            <h2 class="section-title">Platform Notes</h2>
+            <div class="notes-grid">
+                <div class="note-card">
+                    <h3>Windows</h3>
+                    <ul>
+                        <li>CLI: Requires no additional dependencies</li>
+                        <li>GUI: Standard Windows installer (.msi)</li>
+                        <li>Scheduling: Uses Windows Task Scheduler</li>
+                        <li>Wallpaper: Sets via Windows API</li>
+                    </ul>
+                </div>
+                <div class="note-card">
+                    <h3>macOS</h3>
+                    <ul>
+                        <li>CLI: No dependencies needed</li>
+                        <li>GUI: Standard macOS app bundle (.dmg)</li>
+                        <li>Scheduling: Uses launchd (LaunchAgents)</li>
+                        <li>Wallpaper: Sets via AppleScript</li>
+                    </ul>
+                </div>
+                <div class="note-card">
+                    <h3>Linux</h3>
+                    <ul>
+                        <li>CLI: No dependencies needed</li>
+                        <li>GUI: AppImage or build from source</li>
+                        <li>Scheduling: Uses systemd user timers</li>
+                        <li>Wallpaper: Supports GNOME, KDE, XFCE, MATE, Cinnamon</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built by <a href="https://github.com/atsedeweyn" target="_blank">Dag</a></p>
+            <p class="footer-links">
+                <a href="https://github.com/atsedeweyn/life-in-weeks" target="_blank">GitHub</a>
+                <span>•</span>
+                <a href="https://github.com/atsedeweyn/life-in-weeks/blob/main/LICENSE" target="_blank">License</a>
+                <span>•</span>
+                <a href="https://waitbutwhy.com/2014/05/life-weeks.html" target="_blank">Inspired by Wait But Why</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
