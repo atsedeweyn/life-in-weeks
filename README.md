@@ -2,7 +2,6 @@
 
 A dynamic wallpaper generator that visualizes your life in weeks. Track your time, make it count.
 
-![Life in Weeks Preview](https://via.placeholder.com/800x450/1c1c20/ff7864?text=Life+in+Weeks)
 
 ## Features
 
