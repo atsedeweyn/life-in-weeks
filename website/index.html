@@ -117,6 +117,10 @@
                         <h3>Windows Installation</h3>
                         <div class="code-block">
                             <code>
+# Option A: install directly from git (no clone needed)<br>
+cargo install --git https://github.com/atsedeweyn/life-in-weeks liw-cli<br>
+<br>
+# Option B: download from Releases<br>
 # 1. Download liw-windows-amd64.exe from Releases<br>
 # 2. Rename to liw.exe (optional)<br>
 # 3. Add to PATH or run directly:<br>
@@ -128,6 +132,10 @@
                         <h3>macOS Installation</h3>
                         <div class="code-block">
                             <code>
+# Option A: install directly from git (no clone needed)<br>
+cargo install --git https://github.com/atsedeweyn/life-in-weeks liw-cli<br>
+<br>
+# Option B: download from Releases<br>
 # 1. Download liw-macos-arm64 (M1/M2) or liw-macos-amd64 (Intel)<br>
 # 2. Make executable and move to PATH:<br>
 chmod +x liw-macos-*<br>
@@ -139,6 +147,10 @@ sudo mv liw-macos-* /usr/local/bin/liw
                         <h3>Linux Installation</h3>
                         <div class="code-block">
                             <code>
+# Option A: install directly from git (no clone needed)<br>
+cargo install --git https://github.com/atsedeweyn/life-in-weeks liw-cli<br>
+<br>
+# Option B: download from Releases<br>
 # 1. Download liw-linux-amd64 from Releases<br>
 # 2. Make executable and move to PATH:<br>
 chmod +x liw-linux-amd64<br>
@@ -254,8 +266,7 @@ liw config show
                     <h4>5. Enable Weekly Auto-Update</h4>
                     <div class="code-block">
                         <code>
-# Install weekly schedule (runs every Monday at 6 AM)<br>
-liw schedule install<br>
+# Weekly schedule auto-installs after your first non-preview generate<br>
 <br>
 # Check schedule status<br>
 liw schedule status<br>

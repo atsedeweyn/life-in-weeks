@@ -24,7 +24,13 @@ A dynamic wallpaper generator that visualizes your life in weeks. Track your tim
 
 ### CLI (for power users)
 
-Download the latest release from [GitHub Releases](https://github.com/atsedeweyn/life-in-weeks/releases).
+Option A: Install directly from git (no clone needed)
+
+```bash
+cargo install --git https://github.com/atsedeweyn/life-in-weeks liw-cli
+```
+
+Option B: Download the latest release from [GitHub Releases](https://github.com/atsedeweyn/life-in-weeks/releases).
 
 **macOS/Linux:**
 ```bash
@@ -33,8 +39,8 @@ curl -L https://github.com/atsedeweyn/life-in-weeks/releases/latest/download/liw
 chmod +x liw
 sudo mv liw /usr/local/bin/
 
-# Or using cargo
-cargo install liw-cli
+# Or using cargo from git
+cargo install --git https://github.com/atsedeweyn/life-in-weeks liw-cli
 ```
 
 **Windows:**
@@ -68,8 +74,7 @@ liw config set theme dark
 # Show current config
 liw config show
 
-# Install weekly auto-update
-liw schedule install
+# Weekly schedule is auto-installed after first non-preview generate
 
 # Check schedule status
 liw schedule status

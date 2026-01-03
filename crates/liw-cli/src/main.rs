@@ -27,9 +27,9 @@ struct Cli {
 enum Commands {
     /// Generate and optionally set wallpaper
     Generate {
-        /// Mode: life, year-end, or next-months
-        #[arg(short, long, default_value = "year-end")]
-        mode: String,
+        /// Mode: life, year-end, or next-months (defaults to saved config)
+        #[arg(short, long)]
+        mode: Option<String>,
 
         /// Date of birth (YYYY-MM-DD) for life mode
         #[arg(long)]
@@ -138,7 +138,7 @@ fn main() -> Result<()> {
 
 #[allow(clippy::too_many_arguments)]
 fn cmd_generate(
-    mode_str: String,
+    mode_str: Option<String>,
     dob_str: Option<String>,
     lifespan: Option<u8>,
     months: Option<u8>,
@@ -150,35 +150,50 @@ fn cmd_generate(
 ) -> Result<()> {
     // Load config for defaults
     let mut config = Config::load().unwrap_or_default();
+    let mut config_changed = false;
 
     // Apply overrides from CLI
     if let Some(ref t) = theme_str {
         config.set("theme", t)?;
+        config_changed = true;
     }
     if let Some(w) = width {
         config.screen_width = w;
+        config_changed = true;
     }
     if let Some(h) = height {
         config.screen_height = h;
+        config_changed = true;
     }
     if let Some(l) = lifespan {
         config.lifespan_years = l;
+        config_changed = true;
     }
     if let Some(m) = months {
         config.next_months = m;
+        config_changed = true;
     }
 
     // Parse DOB
     let dob = if let Some(ref dob_str) = dob_str {
-        Some(
+        let parsed = Some(
             NaiveDate::parse_from_str(dob_str, "%Y-%m-%d")
                 .with_context(|| format!("Invalid date format: {}. Use YYYY-MM-DD", dob_str))?,
-        )
+        );
+        config.dob = parsed;
+        config_changed = true;
+        parsed
     } else {
         config.dob
     };
 
     // Parse mode
+    let mode_override = mode_str.is_some();
+    let mode_str = mode_str.unwrap_or_else(|| config.default_mode.clone());
+    if mode_override && mode_str != config.default_mode {
+        config.default_mode = mode_str.clone();
+        config_changed = true;
+    }
     let mode = Mode::from_str_with_params(
         &mode_str,
         dob,
@@ -225,11 +240,20 @@ fn cmd_generate(
     save_grid(&image, &output_path)?;
     println!("\nWallpaper saved to: {:?}", output_path);
 
+    if config_changed {
+        config.save()?;
+    }
+
     // Set as wallpaper unless preview mode
     if !preview {
         println!("Setting as wallpaper...");
         set_wallpaper(&output_path)?;
         println!("Done! Wallpaper has been updated.");
+
+        if !is_schedule_installed() {
+            install_schedule()?;
+            println!("Weekly schedule installed. Wallpaper will update every Monday at 6:00 AM.");
+        }
     } else {
         println!("Preview mode - wallpaper not set.");
     }
