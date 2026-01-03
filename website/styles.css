@@ -536,6 +536,59 @@ section {
     letter-spacing: 0.05em;
 }
 
+.btn-small {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8rem;
+}
+
+.download-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.download-note {
+    text-align: center;
+    margin-top: var(--space-lg);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.download-note a {
+    color: var(--matrix-green);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.download-note a:hover {
+    color: var(--matrix-green-bright);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.download-card.recommended {
+    border-color: var(--matrix-green);
+    box-shadow: var(--glow);
+    position: relative;
+}
+
+.download-card.recommended::after {
+    content: 'FOR YOU';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--matrix-green);
+    color: var(--bg-primary);
+    padding: 2px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+}
+
 /* ========================================
    Code Blocks
    ======================================== */

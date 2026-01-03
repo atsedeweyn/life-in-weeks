@@ -303,6 +303,98 @@
 })();
 
 // ========================================
+// Platform Detection & Direct Downloads
+// ========================================
+
+(function initDownloads() {
+    const REPO = 'atsedeweyn/life-in-weeks';
+    const RELEASE_BASE = `https://github.com/${REPO}/releases/latest/download`;
+    const RELEASE_PAGE = `https://github.com/${REPO}/releases/latest`;
+    
+    // Detect user's platform
+    function detectPlatform() {
+        const ua = navigator.userAgent.toLowerCase();
+        const platform = navigator.platform?.toLowerCase() || '';
+        
+        if (ua.includes('win') || platform.includes('win')) {
+            return 'windows';
+        } else if (ua.includes('mac') || platform.includes('mac')) {
+            // Check for Apple Silicon
+            const isARM = ua.includes('arm') || 
+                         (navigator.userAgentData?.platform === 'macOS' && 
+                          navigator.userAgentData?.architecture === 'arm');
+            return isARM ? 'macos-arm' : 'macos';
+        } else if (ua.includes('linux') || platform.includes('linux')) {
+            return 'linux';
+        }
+        return 'unknown';
+    }
+    
+    const platform = detectPlatform();
+    
+    // CLI download URLs - these trigger direct downloads
+    const cliUrls = {
+        'windows': `${RELEASE_BASE}/liw-windows-amd64.exe`,
+        'macos': `${RELEASE_BASE}/liw-macos-amd64`,
+        'macos-arm': `${RELEASE_BASE}/liw-macos-arm64`,
+        'linux': `${RELEASE_BASE}/liw-linux-amd64`,
+        'unknown': RELEASE_PAGE
+    };
+    
+    const platformNames = {
+        'windows': 'Windows',
+        'macos': 'macOS (Intel)',
+        'macos-arm': 'macOS (Apple Silicon)',
+        'linux': 'Linux'
+    };
+    
+    // Update CLI download button
+    const cliBtn = document.getElementById('cli-download-btn');
+    if (cliBtn && platform !== 'unknown') {
+        cliBtn.href = cliUrls[platform];
+        cliBtn.textContent = `Download for ${platformNames[platform]}`;
+        cliBtn.removeAttribute('target'); // Direct download, no new tab
+    }
+    
+    // Auto-select user's platform in the platform selector
+    const platformMap = {
+        'windows': 'windows',
+        'macos': 'macos',
+        'macos-arm': 'macos',
+        'linux': 'linux'
+    };
+    
+    const platformKey = platformMap[platform];
+    if (platformKey) {
+        const platformBtn = document.querySelector(`.platform-btn[data-platform="${platformKey}"]`);
+        const platformInst = document.querySelector(`.platform-instructions[data-platform="${platformKey}"]`);
+        
+        if (platformBtn && platformInst) {
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.platform-instructions').forEach(inst => inst.classList.remove('active'));
+            platformBtn.classList.add('active');
+            platformInst.classList.add('active');
+        }
+    }
+    
+    // Highlight recommended GUI download card
+    const guiCardMap = {
+        'windows': 'gui-windows',
+        'macos': 'gui-macos',
+        'macos-arm': 'gui-macos',
+        'linux': 'gui-linux'
+    };
+    
+    const cardId = guiCardMap[platform];
+    if (cardId) {
+        const card = document.getElementById(cardId);
+        if (card) {
+            card.classList.add('recommended');
+        }
+    }
+})();
+
+// ========================================
 // Console Easter Egg
 // ========================================
 
