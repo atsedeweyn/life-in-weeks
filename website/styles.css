@@ -782,6 +782,188 @@ section {
     color: var(--text-dim);
 }
 
+/* Support Button */
+.support-section {
+    margin-bottom: var(--space-xl);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.support-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, #FFDD00 0%, #FF6B35 100%);
+    color: #0a0a0a;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 2px solid #FFDD00;
+    box-shadow: 0 4px 20px rgba(255, 221, 0, 0.4), 0 0 30px rgba(255, 107, 53, 0.3);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: relative;
+    overflow: hidden;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.support-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.support-btn:hover::before {
+    left: 100%;
+}
+
+.support-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 30px rgba(255, 221, 0, 0.6), 0 0 40px rgba(255, 107, 53, 0.5);
+    border-color: #FF6B35;
+}
+
+.support-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(255, 221, 0, 0.4), 0 0 30px rgba(255, 107, 53, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(255, 221, 0, 0.6), 0 0 40px rgba(255, 107, 53, 0.5);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Support Message (Post-Download) */
+.support-message {
+    position: fixed;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 90%;
+    width: 500px;
+}
+
+.support-message.show {
+    bottom: 30px;
+}
+
+.support-message-content {
+    background: var(--bg-elevated);
+    border: 2px solid var(--matrix-green);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 30px var(--accent-glow);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    position: relative;
+    animation: slideUpBounce 0.5s ease-out;
+}
+
+@keyframes slideUpBounce {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.support-message-text {
+    flex: 1;
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    min-width: 200px;
+}
+
+.support-btn-inline {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.support-close {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: var(--space-xs);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.support-close:hover {
+    color: var(--matrix-green);
+    background: rgba(0, 255, 65, 0.1);
+}
+
+@media (max-width: 768px) {
+    .support-message {
+        width: calc(100% - 40px);
+        max-width: none;
+    }
+    
+    .support-message-content {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .support-message-text {
+        margin-bottom: var(--space-sm);
+    }
+    
+    .support-btn-inline {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* ========================================
    Responsive
    ======================================== */

@@ -537,6 +537,75 @@
     updateGuiCard(document.getElementById('gui-windows'), guiLinks.windows);
     updateGuiCard(document.getElementById('gui-macos'), guiLinks.macos);
     updateGuiCard(document.getElementById('gui-linux'), guiLinks.linux);
+
+    // Show support button after download clicks
+    function showSupportAfterDownload() {
+        // Check if we've already shown it in this session
+        if (sessionStorage.getItem('supportShown')) {
+            return;
+        }
+        
+        // Create support message element
+        const supportMessage = document.createElement('div');
+        supportMessage.className = 'support-message';
+        supportMessage.innerHTML = `
+            <div class="support-message-content">
+                <p class="support-message-text">Enjoying Life in Weeks? Consider supporting the project!</p>
+                <a href="https://buymeacoffee.com/karpathy" target="_blank" class="support-btn support-btn-inline">
+                    <span class="support-icon">☕</span>
+                    <span>Buy me a coffee</span>
+                </a>
+                <button class="support-close" aria-label="Close">×</button>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(supportMessage);
+        
+        // Animate in
+        setTimeout(() => {
+            supportMessage.classList.add('show');
+        }, 100);
+        
+        // Close button handler
+        const closeBtn = supportMessage.querySelector('.support-close');
+        closeBtn.addEventListener('click', () => {
+            supportMessage.classList.remove('show');
+            setTimeout(() => {
+                supportMessage.remove();
+            }, 300);
+        });
+        
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (supportMessage.parentNode) {
+                supportMessage.classList.remove('show');
+                setTimeout(() => {
+                    supportMessage.remove();
+                }, 300);
+            }
+        }, 10000);
+        
+        // Mark as shown in this session
+        sessionStorage.setItem('supportShown', 'true');
+    }
+
+    // Track download clicks
+    const downloadElements = [
+        document.getElementById('cli-download-btn'),
+        document.getElementById('gui-windows'),
+        document.getElementById('gui-macos'),
+        document.getElementById('gui-linux')
+    ];
+
+    downloadElements.forEach(element => {
+        if (element) {
+            element.addEventListener('click', () => {
+                // Small delay to ensure download starts
+                setTimeout(showSupportAfterDownload, 500);
+            });
+        }
+    });
 })();
 
 // ========================================
