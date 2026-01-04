@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Life in Weeks",
+  "productName": "LifeInWeeks",
   "version": "0.1.0",
-  "identifier": "com.lifeinweeks.app",
+  "identifier": "com.lifeinweeks.desktop",
   "build": {
     "frontendDist": "../tauri-app/src",
     "devUrl": "http://localhost:1420",
