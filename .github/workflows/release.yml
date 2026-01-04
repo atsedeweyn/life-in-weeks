@@ -126,23 +126,10 @@ jobs:
           echo "=== Checking build output ==="
           echo "Current directory: $(pwd)"
           echo ""
-          echo "=== src-tauri directory contents ==="
-          ls -la src-tauri/ || echo "src-tauri not found"
-          echo ""
-          echo "=== target directory ==="
-          ls -la src-tauri/target/ 2>/dev/null || echo "target dir not found"
-          echo ""
-          echo "=== target/release directory ==="
-          ls -la src-tauri/target/release/ 2>/dev/null || echo "release dir not found"
-          echo ""
-          echo "=== Bundle directory ==="
-          if [ -d "src-tauri/target/release/bundle" ]; then
-            echo "Bundle directory exists!"
-            find src-tauri/target/release/bundle -type f 2>/dev/null | head -50
-          else
-            echo "Bundle directory does not exist!"
-          fi
-
+          echo "=== Root target directory ==="
+          ls -la target/release/bundle/ 2>/dev/null || echo "target/release/bundle not found"
+          find target/release/bundle -maxdepth 3 2>/dev/null || true
+          
       - name: Prepare GUI artifact (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
@@ -150,17 +137,24 @@ jobs:
           set -euo pipefail
           found=false
           
+          # Check common bundle locations
+          BUNDLE_DIR="target/release/bundle"
+          if [ ! -d "$BUNDLE_DIR" ]; then
+             BUNDLE_DIR="src-tauri/target/release/bundle"
+          fi
+          echo "Looking in: $BUNDLE_DIR"
+          
           # Check for NSIS installer
-          if ls src-tauri/target/release/bundle/nsis/*.exe 1>/dev/null 2>&1; then
-            nsis=$(ls src-tauri/target/release/bundle/nsis/*.exe | head -n 1)
+          if ls "$BUNDLE_DIR"/nsis/*.exe 1>/dev/null 2>&1; then
+            nsis=$(ls "$BUNDLE_DIR"/nsis/*.exe | head -n 1)
             echo "Found NSIS installer: $nsis"
             cp "$nsis" liw-gui-windows.exe
             found=true
           fi
           
           # Check for MSI installer
-          if ls src-tauri/target/release/bundle/msi/*.msi 1>/dev/null 2>&1; then
-            msi=$(ls src-tauri/target/release/bundle/msi/*.msi | head -n 1)
+          if ls "$BUNDLE_DIR"/msi/*.msi 1>/dev/null 2>&1; then
+            msi=$(ls "$BUNDLE_DIR"/msi/*.msi | head -n 1)
             echo "Found MSI installer: $msi"
             cp "$msi" liw-gui-windows.msi
             found=true
@@ -169,7 +163,7 @@ jobs:
           if [ "$found" = false ]; then
             echo "No Windows GUI installer found." >&2
             echo "Available in bundle dir:"
-            find src-tauri/target/release/bundle -type f 2>/dev/null || echo "Bundle directory not found"
+            find "$BUNDLE_DIR" -type f 2>/dev/null || echo "Bundle directory not found"
             exit 1
           fi
 
@@ -180,9 +174,16 @@ jobs:
           set -euo pipefail
           found=false
           
+          # Check common bundle locations
+          BUNDLE_DIR="target/release/bundle"
+          if [ ! -d "$BUNDLE_DIR" ]; then
+             BUNDLE_DIR="src-tauri/target/release/bundle"
+          fi
+          echo "Looking in: $BUNDLE_DIR"
+          
           # Check for DMG
-          if ls src-tauri/target/release/bundle/dmg/*.dmg 1>/dev/null 2>&1; then
-            dmg=$(ls src-tauri/target/release/bundle/dmg/*.dmg | head -n 1)
+          if ls "$BUNDLE_DIR"/dmg/*.dmg 1>/dev/null 2>&1; then
+            dmg=$(ls "$BUNDLE_DIR"/dmg/*.dmg | head -n 1)
             echo "Found DMG: $dmg"
             cp "$dmg" liw-gui-macos.dmg
             found=true
@@ -190,11 +191,11 @@ jobs:
           
           # Check for .app bundle and create a zip if DMG not found
           if [ "$found" = false ]; then
-            if ls -d src-tauri/target/release/bundle/macos/*.app 1>/dev/null 2>&1; then
-              app=$(ls -d src-tauri/target/release/bundle/macos/*.app | head -n 1)
+            if ls -d "$BUNDLE_DIR"/macos/*.app 1>/dev/null 2>&1; then
+              app=$(ls -d "$BUNDLE_DIR"/macos/*.app | head -n 1)
               echo "Found .app bundle: $app"
-              cd src-tauri/target/release/bundle/macos
-              zip -r "../../../../../liw-gui-macos.app.zip" "$(basename "$app")"
+              cd "$BUNDLE_DIR"/macos
+              zip -r "../../../../liw-gui-macos.app.zip" "$(basename "$app")"
               cd -
               found=true
             fi
@@ -203,7 +204,7 @@ jobs:
           if [ "$found" = false ]; then
             echo "No macOS GUI bundle found." >&2
             echo "Available in bundle dir:"
-            find src-tauri/target/release/bundle -type f 2>/dev/null || echo "Bundle directory not found"
+            find "$BUNDLE_DIR" -type f 2>/dev/null || echo "Bundle directory not found"
             exit 1
           fi
 
@@ -214,17 +215,24 @@ jobs:
           set -euo pipefail
           found=false
           
+          # Check common bundle locations
+          BUNDLE_DIR="target/release/bundle"
+          if [ ! -d "$BUNDLE_DIR" ]; then
+             BUNDLE_DIR="src-tauri/target/release/bundle"
+          fi
+          echo "Looking in: $BUNDLE_DIR"
+          
           # Check for AppImage
-          if ls src-tauri/target/release/bundle/appimage/*.AppImage 1>/dev/null 2>&1; then
-            appimage=$(ls src-tauri/target/release/bundle/appimage/*.AppImage | head -n 1)
+          if ls "$BUNDLE_DIR"/appimage/*.AppImage 1>/dev/null 2>&1; then
+            appimage=$(ls "$BUNDLE_DIR"/appimage/*.AppImage | head -n 1)
             echo "Found AppImage: $appimage"
             cp "$appimage" liw-gui-linux.AppImage
             found=true
           fi
           
           # Check for .deb
-          if ls src-tauri/target/release/bundle/deb/*.deb 1>/dev/null 2>&1; then
-            deb=$(ls src-tauri/target/release/bundle/deb/*.deb | head -n 1)
+          if ls "$BUNDLE_DIR"/deb/*.deb 1>/dev/null 2>&1; then
+            deb=$(ls "$BUNDLE_DIR"/deb/*.deb | head -n 1)
             echo "Found DEB: $deb"
             cp "$deb" liw-gui-linux.deb
             found=true
@@ -233,7 +241,7 @@ jobs:
           if [ "$found" = false ]; then
             echo "No Linux GUI bundle found." >&2
             echo "Available in bundle dir:"
-            find src-tauri/target/release/bundle -type f 2>/dev/null || echo "Bundle directory not found"
+            find "$BUNDLE_DIR" -type f 2>/dev/null || echo "Bundle directory not found"
             exit 1
           fi
 
