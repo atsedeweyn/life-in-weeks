@@ -795,15 +795,15 @@ section {
     align-items: center;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-xl);
-    background: linear-gradient(135deg, #FFDD00 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #8B6914 0%, #B8860B 100%);
     color: #0a0a0a;
     font-family: var(--font-mono);
     font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
     border-radius: 8px;
-    border: 2px solid #FFDD00;
-    box-shadow: 0 4px 20px rgba(255, 221, 0, 0.4), 0 0 30px rgba(255, 107, 53, 0.3);
+    border: 2px solid #B8860B;
+    box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2), 0 0 20px rgba(139, 105, 20, 0.15);
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -819,7 +819,7 @@ section {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
     transition: left 0.5s ease;
 }
 
@@ -829,8 +829,9 @@ section {
 
 .support-btn:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 6px 30px rgba(255, 221, 0, 0.6), 0 0 40px rgba(255, 107, 53, 0.5);
-    border-color: #FF6B35;
+    background: linear-gradient(135deg, #9B7A1F 0%, #C8960C 100%);
+    box-shadow: 0 6px 30px rgba(184, 134, 11, 0.3), 0 0 25px rgba(139, 105, 20, 0.2);
+    border-color: #C8960C;
 }
 
 .support-icon {
@@ -841,10 +842,10 @@ section {
 
 @keyframes pulse-glow {
     0%, 100% {
-        box-shadow: 0 4px 20px rgba(255, 221, 0, 0.4), 0 0 30px rgba(255, 107, 53, 0.3);
+        box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2), 0 0 20px rgba(139, 105, 20, 0.15);
     }
     50% {
-        box-shadow: 0 4px 25px rgba(255, 221, 0, 0.6), 0 0 40px rgba(255, 107, 53, 0.5);
+        box-shadow: 0 4px 25px rgba(184, 134, 11, 0.25), 0 0 25px rgba(139, 105, 20, 0.2);
     }
 }
 
