@@ -321,7 +321,7 @@
     };
 
     const fallbackGuiLinks = {
-        'windows': { url: `${RELEASE_BASE}/liw-gui-windows.exe`, label: '.exe Installer' },
+        'windows': { url: `${RELEASE_BASE}/liw-gui-windows.msi`, label: '.msi Installer' },
         'macos': { url: `${RELEASE_BASE}/liw-gui-macos.dmg`, label: '.dmg Installer' },
         'linux': { url: `${RELEASE_BASE}/liw-gui-linux.AppImage`, label: '.AppImage' }
     };
@@ -411,10 +411,9 @@
         ]);
         if (guiWin && guiWin.browser_download_url) {
             guiLinks.windows.url = guiWin.browser_download_url;
-            guiLinks.windows.label = guiWin.name.toLowerCase().endswith('.exe') ? '.exe Installer' : '.msi Installer';
-        } else {
-            guiLinks.windows.url = RELEASE_PAGE;
+            guiLinks.windows.label = guiWin.name.toLowerCase().endsWith('.exe') ? '.exe Installer' : '.msi Installer';
         }
+        // If not found, keep fallback direct download URL (already set above)
 
         const guiMac = pickAsset(assets, [
             /^liw-gui-macos\.dmg$/i,
@@ -436,9 +435,8 @@
             } else {
                 guiLinks.macos.label = 'macOS Bundle';
             }
-        } else {
-            guiLinks.macos.url = RELEASE_PAGE;
         }
+        // If not found, keep fallback direct download URL (already set above)
 
         const guiLinux = pickAsset(assets, [
             /^liw-gui-linux\.AppImage$/i,
@@ -458,9 +456,8 @@
             } else {
                 guiLinks.linux.label = '.AppImage';
             }
-        } else {
-            guiLinks.linux.url = RELEASE_PAGE;
         }
+        // If not found, keep fallback direct download URL (already set above)
     }
 
     // Update CLI download button
@@ -517,13 +514,26 @@
         if (label && info.label) {
             label.textContent = info.label;
         }
-        if (info.url === RELEASE_PAGE) {
-            card.setAttribute('target', '_blank');
-        } else {
+        // Check if it's a direct download URL (not the releases page)
+        if (info.url && info.url.includes('/releases/download/')) {
+            // Direct download - remove target and add download attribute
             card.removeAttribute('target');
+            // Extract filename from URL for download attribute
+            const filename = info.url.split('/').pop().split('?')[0];
+            card.setAttribute('download', filename);
+        } else if (info.url === RELEASE_PAGE) {
+            // If fallback to release page, open in new tab
+            card.setAttribute('target', '_blank');
+            card.removeAttribute('download');
+        } else {
+            // Any other URL (like browser_download_url from API)
+            card.removeAttribute('target');
+            const filename = info.url.split('/').pop().split('?')[0];
+            card.setAttribute('download', filename);
         }
     }
 
+    // Update GUI cards with direct download links
     updateGuiCard(document.getElementById('gui-windows'), guiLinks.windows);
     updateGuiCard(document.getElementById('gui-macos'), guiLinks.macos);
     updateGuiCard(document.getElementById('gui-linux'), guiLinks.linux);
