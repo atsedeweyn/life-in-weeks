@@ -90,18 +90,34 @@ jobs:
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build GUI (Tauri)
+      - name: Debug - Pre-build checks
         shell: bash
         run: |
-          echo "=== Starting Tauri build ==="
-          echo "Current directory: $(pwd)"
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Rust version: $(rustc --version)"
-          echo ""
-          npx tauri build --verbose
-          echo ""
-          echo "=== Build complete ==="
+          echo "=== Checking dist directory ==="
+          ls -la dist/ || echo "dist directory not found"
+          echo "=== Checking tauri info ==="
+          npx tauri info
+
+      - name: Build GUI (Tauri) - Windows
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          echo "Building for Windows..."
+          npx tauri build --verbose --bundles nsis,msi
+
+      - name: Build GUI (Tauri) - macOS
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          echo "Building for macOS..."
+          npx tauri build --verbose --bundles dmg,app
+
+      - name: Build GUI (Tauri) - Linux
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          echo "Building for Linux..."
+          npx tauri build --verbose --bundles deb,appimage
 
       - name: Debug - List build output
         if: always()
