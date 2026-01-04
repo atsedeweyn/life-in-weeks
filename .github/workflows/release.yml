@@ -276,11 +276,21 @@ jobs:
       - name: Display structure
         run: ls -R artifacts
 
+      - name: Flatten artifacts structure
+        shell: bash
+        run: |
+          # Move all files from subdirectories to root artifacts folder
+          find artifacts -type f -exec mv {} artifacts/ \;
+          # Remove empty subdirectories
+          find artifacts -type d -empty -delete
+          echo "=== Final artifacts structure ==="
+          ls -lh artifacts/
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/**/*
+            artifacts/*
           draft: false
           prerelease: false
           generate_release_notes: true
