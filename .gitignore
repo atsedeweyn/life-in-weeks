@@ -32,3 +32,4 @@ Thumbs.db
 *.png
 !tauri-app/src/**/*.png
 !src-tauri/icons/*.png
+*:Zone.Identifier
