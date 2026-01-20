@@ -538,6 +538,30 @@
     updateGuiCard(document.getElementById('gui-macos'), guiLinks.macos);
     updateGuiCard(document.getElementById('gui-linux'), guiLinks.linux);
 
+    // Show total download count from GitHub release assets (free, no custom analytics needed)
+    const downloadCountRow = document.getElementById('download-count-row');
+    const downloadCountEl = document.getElementById('download-count');
+    if (assets && downloadCountRow && downloadCountEl) {
+        const relevantAssets = assets.filter(a => {
+            const name = (a?.name || '').toLowerCase();
+            // CLI binaries + common GUI artifacts (msi/dmg/appimage) from this repo
+            return (
+                name.startsWith('liw-') ||
+                name.includes('life-in-weeks') ||
+                name.includes('life_in_weeks') ||
+                name.includes('life in weeks')
+            );
+        });
+
+        const totalDownloads = relevantAssets.reduce((sum, a) => {
+            const n = typeof a.download_count === 'number' ? a.download_count : 0;
+            return sum + n;
+        }, 0);
+
+        downloadCountEl.textContent = totalDownloads.toLocaleString();
+        downloadCountRow.style.display = '';
+    }
+
     // Show support button after download clicks
     function showSupportAfterDownload() {
         // Check if we've already shown it in this session
@@ -589,45 +613,24 @@
         // Mark as shown in this session
         sessionStorage.setItem('supportShown', 'true');
     }
-
-    // Send download tracking event to Vercel Web Analytics (if available)
-    function trackDownload(kind, details) {
-        try {
-            if (typeof window !== 'undefined' && typeof window.va === 'function') {
-                window.va('event', {
-                    name: 'download',
-                    data: {
-                        kind,
-                        ...details
-                    }
-                });
-            }
-        } catch {
-            // Analytics should never break the page
-        }
-    }
     
     // Track download clicks
     const downloadElements = [
         {
             element: document.getElementById('cli-download-btn'),
-            kind: 'cli',
-            platform: platformMap[platform] || 'unknown'
+            kind: 'cli'
         },
         {
             element: document.getElementById('gui-windows'),
-            kind: 'gui',
-            platform: 'windows'
+            kind: 'gui'
         },
         {
             element: document.getElementById('gui-macos'),
-            kind: 'gui',
-            platform: 'macos'
+            kind: 'gui'
         },
         {
             element: document.getElementById('gui-linux'),
-            kind: 'gui',
-            platform: 'linux'
+            kind: 'gui'
         }
     ];
     
@@ -635,11 +638,6 @@
         const el = item.element;
         if (el) {
             el.addEventListener('click', () => {
-                trackDownload(item.kind, {
-                    platform: item.platform,
-                    href: el.href || null,
-                    location: window.location.pathname
-                });
                 // Small delay to ensure download starts
                 setTimeout(showSupportAfterDownload, 500);
             });

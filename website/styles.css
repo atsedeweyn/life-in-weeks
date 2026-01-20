@@ -422,6 +422,19 @@ section {
     margin-bottom: var(--space-xl);
 }
 
+.download-count {
+    text-align: center;
+    color: var(--text-muted);
+    margin: calc(var(--space-sm) * -0.5) 0 var(--space-lg);
+    font-size: 0.95rem;
+}
+
+.download-count #download-count {
+    color: var(--matrix-green);
+    font-family: var(--font-mono);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
 .tab-btn {
     padding: var(--space-sm) var(--space-lg);
     font-family: var(--font-mono);
