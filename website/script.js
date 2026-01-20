@@ -590,17 +590,56 @@
         sessionStorage.setItem('supportShown', 'true');
     }
 
+    // Send download tracking event to Vercel Web Analytics (if available)
+    function trackDownload(kind, details) {
+        try {
+            if (typeof window !== 'undefined' && typeof window.va === 'function') {
+                window.va('event', {
+                    name: 'download',
+                    data: {
+                        kind,
+                        ...details
+                    }
+                });
+            }
+        } catch {
+            // Analytics should never break the page
+        }
+    }
+    
     // Track download clicks
     const downloadElements = [
-        document.getElementById('cli-download-btn'),
-        document.getElementById('gui-windows'),
-        document.getElementById('gui-macos'),
-        document.getElementById('gui-linux')
+        {
+            element: document.getElementById('cli-download-btn'),
+            kind: 'cli',
+            platform: platformMap[platform] || 'unknown'
+        },
+        {
+            element: document.getElementById('gui-windows'),
+            kind: 'gui',
+            platform: 'windows'
+        },
+        {
+            element: document.getElementById('gui-macos'),
+            kind: 'gui',
+            platform: 'macos'
+        },
+        {
+            element: document.getElementById('gui-linux'),
+            kind: 'gui',
+            platform: 'linux'
+        }
     ];
-
-    downloadElements.forEach(element => {
-        if (element) {
-            element.addEventListener('click', () => {
+    
+    downloadElements.forEach(item => {
+        const el = item.element;
+        if (el) {
+            el.addEventListener('click', () => {
+                trackDownload(item.kind, {
+                    platform: item.platform,
+                    href: el.href || null,
+                    location: window.location.pathname
+                });
                 // Small delay to ensure download starts
                 setTimeout(showSupportAfterDownload, 500);
             });
